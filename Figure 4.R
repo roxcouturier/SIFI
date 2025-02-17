@@ -6,13 +6,16 @@ library(ggplot2)
 library(gridExtra)
 library(dplyr)
 library(hrbrthemes)
+library(readr)
 
 ###read all files
 
-directory_path <- here("./Figures/Figure 4/Random_SIFI_n_40_640")
+#directory_path <- here("./Figures/Figure 4/Random_SIFI_n_40_640")
+
+directory_path <- "/Users/roxanecouturier/Desktop/Doctorat/SIFI/Figures/Figure 4/Random_SIFI_n_40_640"
 
 
-files_names <- list.files(path = directory_path)
+files_names <- list.files(path = directory_path, full.names = T)
 
 for (file_name in files_names) {
   #read file
@@ -27,6 +30,12 @@ for (file_name in files_names) {
 
 
 ##### graph #### 
+
+#couleurs <- rev(hcl.colors(4,palette = "Oranges"))
+
+couleurs <- c("#fef0d9","#fdcc8a","#fc8d59","#d7301f")
+
+#couleurs <- c("#e66101","#fdb863","#b2abd2","#5e3c99")
 
 
 flip_40 <- subset(H0_scenario1a_flip_random_40, H0_scenario1a_flip_random_40$V4>0.05)
@@ -68,21 +77,36 @@ best_flip$type <- as.factor(best_flip$type)
 
 best_flip <- subset(best_flip,best_flip$sifi<0)
 
+best_flip$type <- factor(best_flip$type, levels = c("n = 640", "n = 160", "n = 80", "n = 40"))
+
+best_flip$sifi <- abs(best_flip$sifi)
+
+
+
 flip <- best_flip %>%
   ggplot( aes(x=sifi, fill=type)) +
-  geom_histogram( position = "identity",color="#e9ecef", alpha=0.6) +
-  scale_fill_manual(values=c("#0754A0","#F12A29","#4233FF","#FF9633"),breaks = c("n = 40", "n = 80", "n = 160", "n = 640")) +
-  theme_ipsum() +
-  labs(fill="", title = "Flip Ramdom SIFI")+   ylab("Count") + 
+  geom_bar( position = "stack") +
+  scale_fill_manual(values = c("n = 40" = "#fef0d9", "n = 80" = "#fdcc8a", "n = 160" = "#fc8d59", "n = 640" = "#d7301f")) +
+  #theme_ipsum() +
+  labs(fill="", title = "")+   ylab("count") + xlab("SIFI") + 
   scale_x_continuous(breaks = seq(min(best_flip$sifi), max(best_flip$sifi), by = 50),
                      labels = seq(min(best_flip$sifi), max(best_flip$sifi), by = 50)) + 
-  annotate("text", x = -200, y =0,label ="SIFI not reached : \n n=40 : 97.6%  \n n=80 : 57.5% \n n=160 : 53.1% \n n=640 : 43.9% ",  vjust = -0.2, color = "black", fontface = "bold") + theme(
-
-    axis.title.x = element_text(size = 14),
-    axis.title.y = element_text(size = 14),  
-    legend.text = element_text(size = 14),
-    text = element_text(size = 100)
+  annotate("text", x = 170, y =10,label ="SIFI not reached : \n n=40 : 97.6%  \n n=80 : 57.5% \n n=160 : 53.1% \n n=640 : 43.9% ",  vjust = -0.4, color = "black", fontface = "bold", size=6) + theme(
+    legend.text = element_text(size = 25),
+    legend.title = element_text(size = 25),
+    text = element_text(size = 25),
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major = element_line(color =alpha("lightgrey",0.2), size = 0.5),
+    panel.grid.minor = element_blank(), 
+    axis.text.x = element_text(size = 20),
+    axis.text.y = element_text(size = 20),
+    axis.title.x = element_text(size = 25),           # Taille du titre de l'axe x
+    axis.title.y = element_text(size = 25),
+    panel.border = element_blank(),
+    legend.position = "bottom"
   )
+
+
 
 
 ##clone
@@ -122,18 +146,24 @@ clone$type <- as.factor(clone$type)
 
 clone <- subset(clone,clone$sifi<0)
 
+clone$type <- factor(clone$type, levels = c("n = 640", "n = 160", "n = 80", "n = 40"))
+
+
+
 clone_graph <- clone %>%
   ggplot( aes(x=sifi, fill=type)) +
-  geom_histogram( position = "identity",color="#e9ecef", alpha=0.6) +
-  scale_fill_manual(values=c("#0754A0","#F12A29","#4233FF","#FF9633"),breaks = c("n = 40", "n = 80", "n = 160", "n = 640")) +
+  geom_bar( position = "stack") +
+  scale_fill_manual(values = c("n = 40" = "#fef0d9", "n = 80" = "#fdcc8a", "n = 160" = "#fc8d59", "n = 640" = "#d7301f")) +
   theme_ipsum() +
   labs(fill="", title = "Clone Ramdom SIFI")+   ylab("Count") + 
   scale_x_continuous(breaks = seq(min(clone$sifi), max(clone$sifi), by = 50),
                      labels = seq(min(clone$sifi), max(clone$sifi), by = 50)) + scale_y_continuous(breaks=seq(0,250,20)) + 
-  annotate("text", x = -200, y =0,label ="SIFI not reached : \n n=40 : 97.6%  \n n=80 : 97.3% \n n=160 : 97.3% \n n=640 : 97.2% ",  vjust = -0.2, color = "black", fontface = "bold")  + theme(
-    axis.text.x = element_text(size = 12),   # Increase x-axis label text size
-    axis.text.y = element_text(size = 12),
-    legend.text = element_text(size = 14)
+  annotate("text", x = -200, y =10,label ="SIFI not reached : \n n=40 : 97.6%  \n n=80 : 97.3% \n n=160 : 97.3% \n n=640 : 97.2% ",  vjust = -0.4, color = "black", fontface = "bold", size=3)  + theme(
+    axis.text.x = element_text(size = 11),   # Increase x-axis label text size
+    axis.text.y = element_text(size = 11),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 12),
+    text = element_text(size = 12)
   )
 
 
@@ -182,25 +212,23 @@ delete$type <- as.factor(delete$type)
 
 delete <- subset(delete,delete$sifi<0)
 
+delete$type <- factor(delete$type, levels = c("n = 640", "n = 160", "n = 80", "n = 40"))
+
+
 delete_graph <- delete %>%
   ggplot( aes(x=sifi, fill=type)) +
-  geom_histogram( position = "identity",color="#e9ecef", alpha=0.6) +
-  scale_fill_manual(values=c("#0754A0","#F12A29","#4233FF","#FF9633"),breaks = c("n = 40", "n = 80", "n = 160", "n = 640")) +
+  geom_bar( position = "stack") +
+  scale_fill_manual(values = c("n = 40" = "#fef0d9", "n = 80" = "#fdcc8a", "n = 160" = "#fc8d59", "n = 640" = "#d7301f")) +
   theme_ipsum() +
   labs(fill="", title = "Delete Ramdom SIFI")+   ylab("Count") + 
   scale_x_continuous(breaks = seq(min(delete$sifi), max(delete$sifi), by = 50),
                      labels = seq(min(delete$sifi), max(delete$sifi), by = 50)) + 
-  annotate("text", x = -200, y =0,label ="SIFI not reached : \n n=40 : 66.5%  \n n=80 : 59.4% \n n=160 : 56.3% \n n=640 : 49.3% ",  vjust = -0.2, color = "black", fontface = "bold")  + theme(
-    axis.text.x = element_text(size = 12),   # Increase x-axis label text size
-    axis.text.y = element_text(size = 12),
-    legend.text = element_text(size = 14)
-  )
-
-
-
-
-
-
+  annotate("text", x = -200, y =10,label ="SIFI not reached : \n n=40 : 66.5%  \n n=80 : 59.4% \n n=160 : 56.3% \n n=640 : 49.3% ",  vjust = -0.4, color = "black", fontface = "bold", size=3)  + theme(
+    axis.text.x = element_text(size = 11),   # Increase x-axis label text size
+    axis.text.y = element_text(size = 11),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 12),
+    text = element_text(size = 12))
 grid.arrange(flip,clone_graph,delete_graph)
 
 
