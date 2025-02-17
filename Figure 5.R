@@ -5,7 +5,7 @@ library(ggplot2)
 library(survminer)
 library(ggforce)
 library(ggnewscale)
-PFS <- read_delim(here("./Figures/Figure 5/PFS.csv"), delim = ";", escape_double = FALSE, trim_ws = TRUE)
+PFS <- read_delim(here("/Users/roxanecouturier/Desktop/Doctorat/SIFI/Figures/Figure 5/PFS.csv"), delim = ";", escape_double = FALSE, trim_ws = TRUE)
 View(PFS)
 
 #Sort the dataset according to follow-up times: give a rank to the patients
@@ -58,26 +58,44 @@ PFS$CDM <- CDM
 #graph: standardized martingale residuals for the PFS dataset
 
 
-ggplot(PFS, aes(x = rank, y = CDM, shape = factor(Trt), color = factor(event))) +
-  geom_point(size = 2) +
-  scale_color_manual(name = "Event", values = c("blue", "red")) +
-  xlab("rank") + ylab("CDM") +
-  labs(shape = "Treatment")+#, color = "Event") +
-  new_scale_color()+
-  geom_ellipse(data = NULL, mapping = aes(x0 = 3, y0 = .0526, b = .0005, a = 1.2, angle = 0, color = "Flip"), inherit.aes = FALSE)+
-  geom_ellipse(data = NULL, mapping = aes(x0 = 4, y0 = .0517, b = .002, a = 2.7, angle = 0, color = "Clone/Remove"), inherit.aes = FALSE)+
-  scale_color_manual(name = "SIFI", values = c("black", "green")) + 
-  theme(
-    panel.background = element_rect(fill = "white"),  # Set background color to white
-    panel.grid.major = element_line(color = "lightgrey", size = 0.5),  # Adjust major grid lines
-    panel.grid.minor = element_blank(), # Hide minor grid lines
-   axis.text.x = element_text(size = 12),   # Increase x-axis label text size
-          axis.text.y = element_text(size = 12)
-  ) +
-  scale_x_continuous(breaks = seq(0, 155, by = 10)) +  # Adjust x-axis breaks (from 0 to 10 by 1)
-  scale_y_continuous(breaks = seq(0, 0.1, by = 0.01)) 
-  
 
-#the geom_ellipse are to represent the subjects selected by the SIFI flip/clone/remove
-#point chooses geom_ellispe by hand because we know the SIFI which was calculated before
+
+
+ggplot(PFS, aes(x = rank, y = CDM)) +
+  geom_point(aes(shape = factor(Trt), 
+                 color = factor(event), 
+                 fill = ifelse(event == 1, "white", "#fc8d59")), 
+             size = 5) +
+  scale_color_manual(name = "Event", values = c("black", "#fc8d59")) +
+  scale_shape_manual(name = "Treatment", values = c("A" = 21, "B" = 23)) +
+  scale_fill_manual(name = "Event", values = c("white", "#fc8d59"), guide="none") +
+  new_scale_color() +
+  geom_ellipse(data = NULL, mapping = aes(x0 = 3, y0 = .0526, b = .0005, a = 1.2, angle = 0, color = "Flip"), inherit.aes = FALSE) +
+  geom_ellipse(data = NULL, mapping = aes(x0 = 4, y0 = .0517, b = .002, a = 2.7, angle = 0, color = "Clone/Remove"), inherit.aes = FALSE) +
+  scale_color_manual(name = "SIFI", values = c("red", "black")) +
+  
+  scale_x_continuous(breaks = seq(0, 155, by = 10)) +
+  scale_y_continuous(breaks = seq(0, 0.1, by = 0.01)) +
+  xlab("rank") + ylab("CDM") +
+  labs(shape = "Treatment") +
+  theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid.major = element_line(color =alpha("lightgrey",0.2), size = 0.5),
+    panel.grid.minor = element_blank(), 
+    axis.text.x = element_text(size = 15),
+    axis.text.y = element_text(size = 15),
+    axis.title.x = element_text(size = 20),           # Taille du titre de l'axe x
+    axis.title.y = element_text(size = 20),
+    legend.text = element_text(size = 20),
+    legend.title = element_text(size = 20),
+    text = element_text(size = 20),
+    
+  )
+
+
+
+
+
+
+
 
