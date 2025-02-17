@@ -187,3 +187,89 @@ Table[22,] <- c("Worst Clone",100,48,40,56,47.4,10.523,0.3247)
 
 
 write.csv(Table, file = "/Users/roxanecouturier/Desktop/SIFI/Table2.csv")
+
+
+#HR cox : 
+
+                  lambdaB <- 210
+lambdaA <- 210
+  n1 <- 66
+  n2 <- 66
+  ka <- 1
+  kb <- 1
+
+
+sim_uncensored_data_cox <- function(lambdaB, lambdaA ,n1, n2, ka,kb){
+  
+  #groupe experimental  
+  B <- data.frame(trt = rep("B", n1))
+  B$time <- rweibull(n1, scale = lambdaB , shape= kb) /30.5
+  B$event = 1
+  
+  #groupe control
+  
+  A <- data.frame(trt=rep("A",n2))
+  A$time <- rweibull(n2, scale = lambdaA , shape= ka)  /30.5
+  A$event = 1
+  
+  
+  data=bind_rows(A,B)
+  
+cox <- coxph(Surv(time,event)~ relevel(factor(trt), ref = "B"),data=data)
+beta <- cox$coefficients
+
+return(beta)
+  
+}
+
+sim_uncensored_data_cox_zph <- function(lambdaB, lambdaA ,n1, n2, ka,kb){
+  
+  #groupe experimental  
+  B <- data.frame(trt = rep("B", n1))
+  B$time <- rweibull(n1, scale = lambdaB , shape= kb) /30.5
+  B$event = 1
+  
+  #groupe control
+  
+  A <- data.frame(trt=rep("A",n2))
+  A$time <- rweibull(n2, scale = lambdaA , shape= ka)  /30.5
+  A$event = 1
+  
+  
+  data=bind_rows(A,B)
+  
+  cox <- coxph(Surv(time,event)~ relevel(factor(trt), ref = "B"),data=data)
+  zph <- cox.zph(cox)$table[6]
+  
+  return(zph)
+  
+}
+
+set.seed(145) 
+sim_cox_H0_1a_uncensored<- replicate(10000,sim_uncensored_data_cox(210,210 ,66, 66, 1,1))
+exp(mean(sim_cox_H0_1a_uncensored)) #1.00
+
+set.seed(145)
+sim_cox_H1_1a_uncensored<- replicate(10000,sim_uncensored_data_cox(210,370 ,66, 66, 1,1))
+exp(mean(sim_cox_H1_1a_uncensored,na.rm=T)) #0.56
+
+set.seed(145)
+sim_cox_H1_1b_uncensored<- replicate(10000,sim_uncensored_data_cox(210,370 ,66, 66, 0.7,0.7))
+exp(mean(sim_cox_H1_1b_uncensored)) #0.67
+
+set.seed(145)
+sim_cox_H1_1b_uncensored_zph<- replicate(10000,sim_uncensored_data_cox_zph(210,370 ,66, 66, 0.7,0.7))
+mean(sim_cox_H1_1b_uncensored_zph) #0.49
+
+
+
+
+set.seed(145)
+sim_cox_H1_1c_uncensored<- replicate(10000,sim_uncensored_data_cox(210,370 ,66, 66, 2,2))
+exp(mean(sim_cox_H1_1c_uncensored)) #0.32
+
+set.seed(145)
+sim_cox_H1_1c_uncensored_zph<- replicate(10000,sim_uncensored_data_cox_zph(210,370 ,66, 66, 2,2))
+mean(sim_cox_H1_1c_uncensored_zph) #0.50
+
+                  
