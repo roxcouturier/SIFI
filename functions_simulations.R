@@ -99,7 +99,7 @@ sim_uncensored_data_sifi_random_remove<- function(lambdaB, lambdaA ,n1, n2, ka,k
 
 # lambdaA = 370 
 # lambdaB = 210 
-# 10 % censored : n = 147
+# 10 % censored : n = 148
 #40 % censored : n = 220
 #60% censored : n = 330
 #80% censored : n= 660
@@ -111,7 +111,7 @@ sim_uncensored_data_sifi_random_remove<- function(lambdaB, lambdaA ,n1, n2, ka,k
 # #Inisalization of value
 # truncation_time <- NULL #the date of control the desired censoring percentage
 # simulated_censoring_percentage <- 1
-# #n_simulations <- c(147,220,330,660) 
+# #n_simulations <- c(148,220,330,660) 
 # n_simulations <- 660 #CHANGE the value 
 # #Find truncation_time
 # for (i in 1:n_simulations) {
@@ -133,8 +133,7 @@ sim_uncensored_data_sifi_random_remove<- function(lambdaB, lambdaA ,n1, n2, ka,k
 # cat("End date of follow up to obtain ", pourcentage_censure * 100,
 #     "% uniformly distributed censors :", truncation_time, "month\n")
 
-#438 ; 178 ; 94 ; 41 under H0
-#606 ; 246 ; 129 ; 57 under H1 
+
 
 ###### functions censored data ######
 
