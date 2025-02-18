@@ -180,6 +180,7 @@ library(stringr)
 
 source("/Users/roxanecouturier/Desktop/Doctorat/SIFI/functions/functions_sifi.R")
 
+#P = pourcentage of informative censoring
 
 sim_censored_data_sifi_original <- function(lambdaB, lambdaA ,n1, n2, ka,kb, truncation_time, direction,operation,p){
   
@@ -200,12 +201,13 @@ sim_censored_data_sifi_original <- function(lambdaB, lambdaA ,n1, n2, ka,kb, tru
   A$time <- pmin(A$time, A$censure)
   
   data=bind_rows(A,B)
-  
-  indices <- which(data$event == 1)  # Trouver les indices où event = 1
-  n_modif <- round(p * length(indices))  # Calculer 10% de ces indices
-  indices_to_change <- sample(indices[data$time < median(data$time)], n_modif) #censure les patients avec un temps court 
-  data$event[indices_to_change] <- 0  # Modifier ces événements
-  
+
+  #informative censoring 
+  indices <- which(data$event == 1)  
+  indices <- indices[data$time[indices] < median(data$time, na.rm = TRUE)]
+  n_modif <- round((n1+n2)*p,1)  
+  indices_to_change <- sample(indices, n_modif, replace = FALSE) 
+  data$event[indices_to_change] <- 0  
   
   sifi_res <- sifi(sv_data = data[,c(2,4,1)],direction =direction, operation = operation, agnostic = T)
   
@@ -234,12 +236,13 @@ sim_censored_data_sifi_remove <- function(lambdaB, lambdaA ,n1, n2, ka,kb, trunc
   A$time <- pmin(A$time, A$censure)
   
   data=bind_rows(A,B)
-  
-  indices <- which(data$event == 1)  # Trouver les indices où event = 1
-  n_modif <- round(p * length(indices))  # Calculer 10% de ces indices
-  indices_to_change <- sample(indices[data$time < median(data$time)], n_modif) #censure les patients avec un temps court 
-  data$event[indices_to_change] <- 0  # Modifier ces événements
-  
+
+  #informative censoring 
+  indices <- which(data$event == 1)  
+  indices <- indices[data$time[indices] < median(data$time, na.rm = TRUE)]
+  n_modif <- round((n1+n2)*p,1)  
+  indices_to_change <- sample(indices, n_modif, replace = FALSE) 
+  data$event[indices_to_change] <- 0  
   
   
   sifi_res <-  sifi_remove(sv_data = data[,c(2,4,1)],direction =direction, agnostic = T)
@@ -257,9 +260,9 @@ sim_censored_data_sifi_remove <- function(lambdaB, lambdaA ,n1, n2, ka,kb, trunc
 
 ###scenarios
 
-###5% censored data + 5% censure inf 
+### 10% censored data : 5% administrative censoring + 5% informative censoring
 
-p=0.05
+p=0.05 
 set.seed(145) 
 H0_scenario1a_best_flip_10per<- replicate(10000,sim_censored_data_sifi_original(210,210 ,74,74 , 1,1, 557,"best","flip",p))
 set.seed(145) 
@@ -287,7 +290,7 @@ set.seed(145)
 H1_scenario1a_worst_remove_10per<- replicate(10000,sim_censored_data_sifi_remove(210,370 ,74,74 , 1,1,769,"worst",p))
 
 
-###40% censored data 
+###40% censored data : 20% administrative censoring and 20% informative censoring 
 p=0.2
 set.seed(145) 
 H0_scenario1a_best_flip_40per<- replicate(10000,sim_censored_data_sifi_original(210,210 ,110,110 , 1,1, 343,"best","flip",p))
